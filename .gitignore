@@ -1,0 +1,36 @@
+# Binários gerados por go build
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binário de teste, gerado com `go test -c`
+*.test
+
+# Saída da ferramenta de cobertura do Go
+*.out
+
+# Diretórios de dependências
+/vendor/
+
+# Diretórios de build
+/bin/
+/pkg/
+
+# Arquivos temporários e de backup
+*~
+*.swp
+*.bak
+*.tmp
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de log
+*.log
+
+# Arquivos de configuração do editor
+.idea/
+.vscode/
