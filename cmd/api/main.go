@@ -8,6 +8,8 @@ var Storage = make(map[string]string)
 
 func main() {
 
+	Storage["id"] = "0"
+
 	router := gin.Default()
 
 	router.Run(":3000")
