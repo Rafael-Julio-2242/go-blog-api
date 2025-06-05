@@ -25,11 +25,24 @@ type PostRepository struct {
 	storage map[string]string
 }
 
+func NewPostRepository(storage map[string]string) *PostRepository {
+	return &PostRepository{
+		storage: storage,
+	}
+}
+
 func (Pr *PostRepository) CreatePost(createPostDTO model.CreatePostDTO) (*model.Post, error) {
 
 	nId, _ := strconv.ParseInt(Pr.storage["id"], 10, 64)
 
 	id := fmt.Sprintf("%d", nId+1)
+
+	status := func() string {
+		if createPostDTO.Status != nil {
+			return *createPostDTO.Status
+		}
+		return "draft"
+	}()
 
 	post := model.Post{
 		Id:               id,
@@ -37,7 +50,7 @@ func (Pr *PostRepository) CreatePost(createPostDTO model.CreatePostDTO) (*model.
 		Summary:          createPostDTO.Summary,
 		Content:          createPostDTO.Content,
 		Author:           createPostDTO.Author,
-		Status:           "draft",
+		Status:           status,
 		Publication_date: "",
 	}
 
@@ -49,6 +62,27 @@ func (Pr *PostRepository) CreatePost(createPostDTO model.CreatePostDTO) (*model.
 
 	Pr.storage[id] = string(jsonBytes)
 	Pr.storage["id"] = id
+
+	return &post, nil
+}
+
+func (Pr *PostRepository) GetPost(postId string) (*model.Post, error) {
+
+	jsonString := Pr.storage[postId]
+
+	if jsonString == "" {
+		return nil, errors.New("post not found")
+	}
+
+	jsonBytes := []byte(jsonString)
+
+	var post model.Post
+
+	err := json.Unmarshal(jsonBytes, &post)
+
+	if err != nil {
+		return nil, errors.New("error on converting from json")
+	}
 
 	return &post, nil
 }
@@ -104,4 +138,11 @@ func (Pr *PostRepository) UpdatePost(updatePostDTO model.UpdatePostDTO) (*model.
 	Pr.storage[post.Id] = string(jsonBytes)
 
 	return &post, nil
+}
+
+func (Pr *PostRepository) DeletePost(postId string) error {
+
+	Pr.storage[postId] = ""
+
+	return nil
 }
