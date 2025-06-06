@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go-blog-api/internal/model"
+	model "go-blog-api/internal/model/posts"
 	"strconv"
 )
 
@@ -71,7 +71,7 @@ func (Pr *PostRepository) GetPost(postId string) (*model.Post, error) {
 	jsonString := Pr.storage[postId]
 
 	if jsonString == "" {
-		return nil, errors.New("post not found")
+		return nil, nil
 	}
 
 	jsonBytes := []byte(jsonString)

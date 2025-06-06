@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-blog-api/internal/repository"
+	"go-blog-api/internal/service"
 	"net/http"
 	"strconv"
 
@@ -9,12 +9,12 @@ import (
 )
 
 type GetPostHandler struct {
-	postRepo repository.PostRepository
+	postService *service.PostService
 }
 
-func NewGetPostHandler(postRepo repository.PostRepository) *GetPostHandler {
+func NewGetPostHandler(postService *service.PostService) *GetPostHandler {
 	return &GetPostHandler{
-		postRepo: postRepo,
+		postService: postService,
 	}
 }
 
@@ -25,7 +25,12 @@ func (Gph *GetPostHandler) Execute(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
 	}
 
-	post, err := Gph.postRepo.GetPost(id)
+	post, err := Gph.postService.GetPost(id)
+
+	if post == nil && err == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post Not Found"})
+		return
+	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

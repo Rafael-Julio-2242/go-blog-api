@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-blog-api/internal/repository"
+	"go-blog-api/internal/service"
 	"net/http"
 	"strconv"
 
@@ -9,12 +9,12 @@ import (
 )
 
 type DeletePostHandler struct {
-	postRepo repository.PostRepository
+	postService *service.PostService
 }
 
-func NewDeletePostHandler(postRepo repository.PostRepository) *DeletePostHandler {
+func NewDeletePostHandler(postService *service.PostService) *DeletePostHandler {
 	return &DeletePostHandler{
-		postRepo: postRepo,
+		postService: postService,
 	}
 }
 
@@ -26,7 +26,7 @@ func (Dph *DeletePostHandler) Execute(c *gin.Context) {
 		return
 	}
 
-	err := Dph.postRepo.DeletePost(id)
+	err := Dph.postService.DeletePost(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})

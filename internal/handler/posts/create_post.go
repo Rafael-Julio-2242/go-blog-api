@@ -1,21 +1,21 @@
 package handler
 
 import (
-	"go-blog-api/internal/model"
-	"go-blog-api/internal/repository"
+	model "go-blog-api/internal/model/posts"
+	"go-blog-api/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CreatePostHandler struct {
-	postRepo repository.PostRepository
+	postService *service.PostService
 }
 
-func NewCreatePostHandler(postRepo repository.PostRepository) *CreatePostHandler {
+func NewCreatePostHandler(postService *service.PostService) *CreatePostHandler {
 
 	return &CreatePostHandler{
-		postRepo: postRepo,
+		postService: postService,
 	}
 }
 func (Cph *CreatePostHandler) Execute(c *gin.Context) {
@@ -26,7 +26,7 @@ func (Cph *CreatePostHandler) Execute(c *gin.Context) {
 		return
 	}
 
-	post, err := Cph.postRepo.CreatePost(dto)
+	post, err := Cph.postService.CreatePost(dto)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
