@@ -89,14 +89,50 @@ func (Pr *PostRepository) GetPost(postId string) (*model.Post, error) {
 
 func (Pr *PostRepository) UpdatePost(updatePostDTO model.UpdatePostDTO) (*model.Post, error) {
 
-	// TODO Implement DB Operation
+	var post model.Post
 
-	return nil, nil
+	result := Pr.db.First(&post).Where("id = ?", post.Id)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if updatePostDTO.Content != nil {
+		post.Content = *updatePostDTO.Content
+	}
+
+	if updatePostDTO.Author != nil {
+		post.Author = *updatePostDTO.Author
+	}
+
+	if updatePostDTO.Status != nil {
+		post.Status = *updatePostDTO.Status
+	}
+
+	if updatePostDTO.Summary != nil {
+		post.Summary = *updatePostDTO.Summary
+	}
+
+	if updatePostDTO.Title != nil {
+		post.Title = *updatePostDTO.Title
+	}
+
+	if updatePostDTO.Publication_date != nil {
+		post.Publication_date = updatePostDTO.Publication_date
+	}
+
+	Pr.db.Save(&post)
+
+	return &post, nil
 }
 
 func (Pr *PostRepository) DeletePost(postId string) error {
 
-	// TODO Implement DB Operation
+	result := Pr.db.Delete(&model.Post{}, "id = ?", postId)
+
+	if result.Error != nil {
+		return result.Error
+	}
 
 	return nil
 }
