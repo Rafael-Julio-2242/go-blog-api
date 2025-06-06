@@ -19,6 +19,10 @@ func (Ps *PostService) CreatePost(createPostDTO model.CreatePostDTO) (*model.Pos
 	return Ps.postRepo.CreatePost(createPostDTO)
 }
 
+func (Ps *PostService) GetPosts() ([]model.Post, error) {
+	return Ps.postRepo.GetPosts()
+}
+
 func (Ps *PostService) UpdatePost(updatePostDTO model.UpdatePostDTO) (*model.Post, error) {
 	return Ps.postRepo.UpdatePost(updatePostDTO)
 }

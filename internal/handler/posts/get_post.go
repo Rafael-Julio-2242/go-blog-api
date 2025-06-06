@@ -23,6 +23,7 @@ func (Gph *GetPostHandler) Execute(c *gin.Context) {
 
 	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		return
 	}
 
 	post, err := Gph.postService.GetPost(id)

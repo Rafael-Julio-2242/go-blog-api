@@ -1,11 +1,10 @@
 package repository
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	model "go-blog-api/internal/model/posts"
-	"strconv"
+
+	"gorm.io/gorm"
 )
 
 /*
@@ -22,20 +21,16 @@ publication_date
 */
 
 type PostRepository struct {
-	storage map[string]string
+	db *gorm.DB
 }
 
-func NewPostRepository(storage map[string]string) *PostRepository {
+func NewPostRepository(db *gorm.DB) *PostRepository {
 	return &PostRepository{
-		storage: storage,
+		db,
 	}
 }
 
 func (Pr *PostRepository) CreatePost(createPostDTO model.CreatePostDTO) (*model.Post, error) {
-
-	nId, _ := strconv.ParseInt(Pr.storage["id"], 10, 64)
-
-	id := fmt.Sprintf("%d", nId+1)
 
 	status := func() string {
 		if createPostDTO.Status != nil {
@@ -45,104 +40,63 @@ func (Pr *PostRepository) CreatePost(createPostDTO model.CreatePostDTO) (*model.
 	}()
 
 	post := model.Post{
-		Id:               id,
-		Title:            createPostDTO.Title,
-		Summary:          createPostDTO.Summary,
-		Content:          createPostDTO.Content,
-		Author:           createPostDTO.Author,
-		Status:           status,
-		Publication_date: "",
+		Title:   createPostDTO.Title,
+		Summary: createPostDTO.Summary,
+		Content: createPostDTO.Content,
+		Author:  createPostDTO.Author,
+		Status:  status,
 	}
 
-	jsonBytes, err := json.Marshal(post)
+	createResult := Pr.db.Create(&post)
 
-	if err != nil {
-		return nil, err
+	if createResult.Error != nil {
+		return nil, createResult.Error
 	}
-
-	Pr.storage[id] = string(jsonBytes)
-	Pr.storage["id"] = id
 
 	return &post, nil
+}
+
+func (Pr *PostRepository) GetPosts() ([]model.Post, error) {
+
+	var posts []model.Post
+
+	result := Pr.db.Model(&model.Post{}).Select("*").Find(&posts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return posts, nil
 }
 
 func (Pr *PostRepository) GetPost(postId string) (*model.Post, error) {
 
-	jsonString := Pr.storage[postId]
+	var post *model.Post
 
-	if jsonString == "" {
+	result := Pr.db.First(&post, "id = ?", postId)
+
+	if result.RowsAffected <= 0 {
 		return nil, nil
 	}
 
-	jsonBytes := []byte(jsonString)
-
-	var post model.Post
-
-	err := json.Unmarshal(jsonBytes, &post)
-
-	if err != nil {
-		return nil, errors.New("error on converting from json")
+	if result.Error != nil {
+		fmt.Println("error: ", result.Error)
+		return nil, result.Error
 	}
 
-	return &post, nil
+	return post, nil
 }
 
 func (Pr *PostRepository) UpdatePost(updatePostDTO model.UpdatePostDTO) (*model.Post, error) {
 
-	jsonString := Pr.storage[updatePostDTO.Id]
+	// TODO Implement DB Operation
 
-	if jsonString == "" {
-		return nil, errors.New("post not found")
-	}
-
-	jsonBytes := []byte(jsonString)
-
-	var post model.Post
-
-	err := json.Unmarshal(jsonBytes, &post)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if updatePostDTO.Title != nil {
-		post.Title = *updatePostDTO.Title
-	}
-
-	if updatePostDTO.Summary != nil {
-		post.Summary = *updatePostDTO.Summary
-	}
-
-	if updatePostDTO.Author != nil {
-		post.Author = *updatePostDTO.Author
-	}
-
-	if updatePostDTO.Content != nil {
-		post.Content = *updatePostDTO.Content
-	}
-
-	if updatePostDTO.Status != nil {
-		post.Status = *updatePostDTO.Status
-	}
-
-	if updatePostDTO.Publication_date != nil {
-		post.Publication_date = *updatePostDTO.Publication_date
-	}
-
-	jsonBytes, err = json.Marshal(post)
-
-	if err != nil {
-		return nil, err
-	}
-
-	Pr.storage[post.Id] = string(jsonBytes)
-
-	return &post, nil
+	return nil, nil
 }
 
 func (Pr *PostRepository) DeletePost(postId string) error {
 
-	Pr.storage[postId] = ""
+	// TODO Implement DB Operation
 
 	return nil
 }

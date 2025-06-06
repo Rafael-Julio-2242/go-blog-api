@@ -34,3 +34,5 @@ Thumbs.db
 # Arquivos de configuração do editor
 .idea/
 .vscode/
+
+.env

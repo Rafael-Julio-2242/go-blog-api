@@ -10,15 +10,17 @@ content
 author
 status "draft" | "posted"
 publication_date
+created_at
 
 */
 
 type Post struct {
-	Id               string
+	Id               int64
 	Title            string
 	Summary          string
 	Content          string
 	Author           string
 	Status           string
-	Publication_date string
+	Publication_date *string
+	CreatedAt        string
 }
