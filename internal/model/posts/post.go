@@ -11,6 +11,7 @@ author
 status "draft" | "posted"
 publication_date
 created_at
+user_id
 
 */
 
@@ -23,4 +24,5 @@ type Post struct {
 	Status           string
 	Publication_date *string
 	CreatedAt        string
+	UserId           int64
 }
