@@ -65,3 +65,30 @@ func (Ur *UserRepository) GetUsers() ([]model.ResponseCreatedUserDTO, error) {
 
 	return formatedUsers, nil
 }
+
+func (Ur *UserRepository) GetUser(id int64) (*model.ResponseCreatedUserDTO, error) {
+
+	var user model.User
+
+	result := Ur.db.Model(&model.User{}).Select("*").Find(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	formatedUser := model.ResponseCreatedUserDTO{
+		Id:        user.Id,
+		Name:      user.Name,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+	}
+
+	return &formatedUser, nil
+}
+
+func (Ur *UserRepository) DeleteUser(id int64) error {
+
+	result := Ur.db.Delete(&model.User{}, "id = ?", id)
+
+	return result.Error
+}
